@@ -1,9 +1,11 @@
 package org.digitalstack.logistics.dao.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
 @Table(name = "destinations")
+@Getter
 public class Destination {
 
     @Id
