@@ -50,31 +50,31 @@ current-date : 15-12-2021,
 overall-profit : 258  
 }
 
-###POST /destinations/add
-###PUT /destinations/update
-###GET /destinations
-###GET /destinations/{destinationId}
-###DELETE /destinations/{destinationId}
+### POST /destinations/add
+### PUT /destinations/update
+### GET /destinations
+### GET /destinations/{destinationId}
+### DELETE /destinations/{destinationId}
 
-##Tabele:
+## Tabele:
 
-###DESTINATIONS
+### DESTINATIONS
 ID (PK)  
 NAME (UNIQUE)  
 DISTANCE
 
-###ORDERS
+### ORDERS
 ID (PK)  
 DESTINATION_ID (FK)  
 DELIVERY_DATE  
 STATUS  
 LAST_UPDATED
 
-##Additional info
+## Additional info
 Toate logurile vor contine timestamp la secunda.  
 Order status enum: NEW, DELIVERING, DELIVERED, CANCELED
 
-###destinations.csv
+### destinations.csv
 Ploiesti,10  
 Pitesti,20  
 Cluj,30  
@@ -86,7 +86,7 @@ Iasi,27
 Bacau,16  
 Constanta,23  
 
-###orders.csv
+### orders.csv
 Ploiesti,15-12-2021  
 Ploiesti,15-12-2021  
 Pitesti,15-12-2021  
