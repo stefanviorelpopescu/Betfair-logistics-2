@@ -2,12 +2,14 @@ package org.digitalstack.logistics.dao.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
 @Setter
 @Getter
+@NoArgsConstructor
 public class Order {
 
     @Id
@@ -28,4 +30,8 @@ public class Order {
     @JoinColumn(name = "destination_id")
     Destination destination;
 
+    public Order(Long deliveryDate, Destination destination) {
+        this.deliveryDate = deliveryDate;
+        this.destination = destination;
+    }
 }
