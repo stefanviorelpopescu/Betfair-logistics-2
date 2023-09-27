@@ -5,6 +5,7 @@ import org.digitalstack.logistics.dao.dto.OrderCreateDto;
 import org.digitalstack.logistics.dao.dto.OrderDto;
 import org.digitalstack.logistics.dao.model.Destination;
 import org.digitalstack.logistics.dao.model.Order;
+import org.digitalstack.logistics.dao.model.OrderStatus;
 import org.digitalstack.logistics.dao.repository.DestinationRepository;
 import org.digitalstack.logistics.dao.repository.OrdersRepository;
 import org.digitalstack.logistics.exception.DateRangeException;
@@ -45,6 +46,25 @@ public class OrdersService {
         return OrderConverter.entityListToDtoList(savedOrders);
     }
 
+    public void cancelOrders(List<Long> orderIds) {
+        List<Long> idsToCancel = orderIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        List<Order> ordersToCancel = ordersRepository.findAllById(idsToCancel);
+        ordersToCancel.forEach(order -> order.setStatus(OrderStatus.CANCELED));
+        ordersRepository.saveAll(ordersToCancel);
+    }
+
+    public List<OrderDto> findOrders(Long deliveryDate, String destinationName) {
+
+        List<Destination> destinations = destinationRepository.findAllByNameContainingIgnoreCase(destinationName);
+
+        List<Order> orders = ordersRepository.findAllByDeliveryDateAndDestinationIn(deliveryDate, destinations);
+        return OrderConverter.entityListToDtoList(orders);
+    }
+
     private static Order getBasicOrderFromDto(OrderCreateDto orderDto, Map<Long, Destination> destinationsById) {
         Long deliveryDate = orderDto.getDeliveryDate();
         Long destinationId = orderDto.getDestinationId();
@@ -62,5 +82,4 @@ public class OrdersService {
             }
         }
     }
-
 }
