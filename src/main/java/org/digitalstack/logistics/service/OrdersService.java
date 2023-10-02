@@ -72,7 +72,7 @@ public class OrdersService {
     }
 
     private void validateDtos(List<OrderCreateDto> ordersDtos, Set<Long> existingDestinationIds) throws DateRangeException, InvalidDestinationException {
-        Long currentDate = companyInformationService.getCurrentDate();
+        Long currentDate = companyInformationService.getCurrentDateAsMilis();
         for (OrderCreateDto orderDto : ordersDtos) {
             if (orderDto.getDeliveryDate() <= currentDate) {
                 throw new DateRangeException("Delivery date must be in the future!");
@@ -81,5 +81,20 @@ public class OrdersService {
                 throw new InvalidDestinationException("Invalid destination ID");
             }
         }
+    }
+
+    public int bulkUpdateOrderStatus(List<Long> orderIds, OrderStatus newStatus) {
+        int count = 0;
+        List<Order> ordersToUpdate = ordersRepository.findAllById(orderIds);
+
+        for (Order order : ordersToUpdate) {
+
+            if (OrderStatus.allowedTransitions.get(order.getStatus()).contains(newStatus)) {
+                order.setStatus(newStatus);
+                count++;
+            }
+            ordersRepository.saveAll(ordersToUpdate);
+        }
+        return count;
     }
 }

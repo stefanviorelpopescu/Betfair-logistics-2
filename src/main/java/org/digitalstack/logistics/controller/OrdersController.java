@@ -44,7 +44,7 @@ public class OrdersController {
     public List<OrderDto> findOrders(@RequestParam(name = "date", required = false) Long deliveryDate,
                                      @RequestParam(name = "destination", required = false, defaultValue = "") String destinationName) {
         if (deliveryDate == null) {
-            deliveryDate = companyInformationService.getCurrentDate();
+            deliveryDate = companyInformationService.getCurrentDateAsMilis();
         }
         return ordersService.findOrders(deliveryDate, destinationName);
     }

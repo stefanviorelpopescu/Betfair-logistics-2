@@ -11,4 +11,5 @@ import java.util.List;
 public interface OrdersRepository extends JpaRepository<Order, Long> {
 
     List<Order> findAllByDeliveryDateAndDestinationIn(Long daliveryDate, List<Destination> destination);
+    List<Order> findAllByDeliveryDate(Long daliveryDate);
 }
