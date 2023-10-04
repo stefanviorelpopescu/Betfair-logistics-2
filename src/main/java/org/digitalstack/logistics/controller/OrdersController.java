@@ -33,7 +33,7 @@ public class OrdersController {
         this.ordersService = ordersService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<List<OrderDto>> addOrders(@Valid @RequestBody List<OrderCreateDto> createDtos)
             throws DateRangeException, InvalidDestinationException {
         List<OrderDto> orderDtos = ordersService.addOrders(createDtos);

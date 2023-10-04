@@ -2,6 +2,7 @@ package org.digitalstack.logistics.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import org.digitalstack.logistics.exception.DateRangeException;
+import org.digitalstack.logistics.exception.DestinationNotFoundException;
 import org.digitalstack.logistics.exception.InvalidDestinationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,4 +19,9 @@ public class GlobalControllerAdvice {
         return new ResponseEntity<>("Bad request: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DestinationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleDestinationNotFoundException(DestinationNotFoundException exception) {
+
+    }
 }
