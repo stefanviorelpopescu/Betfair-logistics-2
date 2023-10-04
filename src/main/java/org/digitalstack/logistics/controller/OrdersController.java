@@ -1,5 +1,10 @@
 package org.digitalstack.logistics.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.digitalstack.logistics.dao.dto.OrderCreateDto;
@@ -40,6 +45,13 @@ public class OrdersController {
         ordersService.cancelOrders(orderIds);
     }
 
+    @Operation(summary = "Get a orders by date and/or destination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found some orders",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation =  OrderDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content) })
     @GetMapping("/status")
     public List<OrderDto> findOrders(@RequestParam(name = "date", required = false) Long deliveryDate,
                                      @RequestParam(name = "destination", required = false, defaultValue = "") String destinationName) {
@@ -49,8 +61,4 @@ public class OrdersController {
         return ordersService.findOrders(deliveryDate, destinationName);
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, DateRangeException.class, InvalidDestinationException.class})
-    public ResponseEntity<String> handleConstraintViolationException(Exception ex) {
-        return new ResponseEntity<>("Bad request: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
 }
