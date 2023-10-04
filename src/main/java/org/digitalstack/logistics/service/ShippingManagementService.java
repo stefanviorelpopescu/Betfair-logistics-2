@@ -17,11 +17,13 @@ public class ShippingManagementService {
     private final CompanyInformationService companyInformationService;
     private final ShippingService shippingService;
     private final OrdersRepository ordersRepository;
+    private final OrdersService ordersService;
 
-    public ShippingManagementService(CompanyInformationService companyInformationService, ShippingService shippingService, OrdersRepository ordersRepository) {
+    public ShippingManagementService(CompanyInformationService companyInformationService, ShippingService shippingService, OrdersRepository ordersRepository, OrdersService ordersService) {
         this.companyInformationService = companyInformationService;
         this.shippingService = shippingService;
         this.ordersRepository = ordersRepository;
+        this.ordersService = ordersService;
     }
 
     public String startNewDay() {
@@ -31,15 +33,15 @@ public class ShippingManagementService {
         long currentDate = companyInformationService.getCurrentDateAsMilis();
         List<Order> ordersForToday = ordersRepository.findAllByDeliveryDate(currentDate);
 
-        ordersForToday.forEach(order -> order.setStatus(OrderStatus.DELIVERING));
-        ordersRepository.saveAll(ordersForToday);
+        int deliveringCount = ordersService.bulkUpdateOrderStatus(ordersForToday, OrderStatus.DELIVERING, true);
 
         Map<Destination, List<Order>> ordersByDestination = ordersForToday.stream()
+                .filter(order -> order.getStatus() == OrderStatus.DELIVERING)
                 .collect(Collectors.groupingBy(Order::getDestination));
 
         ordersByDestination.entrySet().forEach(shippingService::shipToDestination);
 
-        String response = String.format("Started shipping %d orders to %d destinations.", ordersForToday.size(), ordersByDestination.keySet().size());
+        String response = String.format("Started shipping %d orders to %d destinations.", deliveringCount, ordersByDestination.keySet().size());
         log.info(response);
         return response;
     }

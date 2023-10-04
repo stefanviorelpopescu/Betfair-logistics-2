@@ -53,8 +53,7 @@ public class OrdersService {
                 .toList();
 
         List<Order> ordersToCancel = ordersRepository.findAllById(idsToCancel);
-        ordersToCancel.forEach(order -> order.setStatus(OrderStatus.CANCELED));
-        ordersRepository.saveAll(ordersToCancel);
+        bulkUpdateOrderStatus(ordersToCancel, OrderStatus.CANCELED, false);
     }
 
     public List<OrderDto> findOrders(Long deliveryDate, String destinationName) {
@@ -83,12 +82,18 @@ public class OrdersService {
         }
     }
 
-    public int bulkUpdateOrderStatus(List<Long> orderIds, OrderStatus newStatus) {
+    public int bulkUpdateOrderStatus(List<Order> orders, OrderStatus newStatus, boolean refreshOrders) {
         int count = 0;
-        List<Order> ordersToUpdate = ordersRepository.findAllById(orderIds);
+
+        List<Order> ordersToUpdate = orders;
+        if (refreshOrders) {
+            List<Long> orderIds = orders.stream()
+                    .map(Order::getId)
+                    .toList();
+            ordersToUpdate = ordersRepository.findAllById(orderIds);
+        }
 
         for (Order order : ordersToUpdate) {
-
             if (OrderStatus.allowedTransitions.get(order.getStatus()).contains(newStatus)) {
                 order.setStatus(newStatus);
                 count++;
@@ -97,4 +102,5 @@ public class OrdersService {
         }
         return count;
     }
+
 }

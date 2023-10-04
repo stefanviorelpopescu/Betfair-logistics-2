@@ -21,4 +21,8 @@ public class CompanyInformationService {
         currentDate = currentDate.plusDays(1);
     }
 
+    public synchronized void addToProfit(long profitToAdd) {
+        profit += profitToAdd;
+    }
+
 }

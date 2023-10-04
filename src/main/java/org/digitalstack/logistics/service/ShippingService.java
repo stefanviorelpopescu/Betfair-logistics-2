@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.digitalstack.logistics.dao.model.Destination;
 import org.digitalstack.logistics.dao.model.Order;
 import org.digitalstack.logistics.dao.model.OrderStatus;
-import org.digitalstack.logistics.dao.repository.OrdersRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +15,11 @@ import java.util.Map;
 public class ShippingService {
 
     private final OrdersService ordersService;
-    private final OrdersRepository ordersRepository;
+    private final CompanyInformationService companyInformationService;
 
-    public ShippingService(OrdersService ordersService, OrdersRepository ordersRepository) {
+    public ShippingService(OrdersService ordersService, CompanyInformationService companyInformationService) {
         this.ordersService = ordersService;
-        this.ordersRepository = ordersRepository;
+        this.companyInformationService = companyInformationService;
     }
 
     @Async("shippingExecutor")
@@ -32,22 +31,16 @@ public class ShippingService {
         log.info(String.format("Starting %d deliveries for %s for %d km on thread %s",
                 orders.size(), destination.getName(), destination.getDistance(), Thread.currentThread().getName()));
 
-
         try {
             Thread.sleep(destination.getDistance() * 1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        List<Long> orderIds = orders.stream()
-                .map(Order::getId)
-                .toList();
-        int updatedOrders = ordersService.bulkUpdateOrderStatus(orderIds, OrderStatus.DELIVERED);
+        int updatedOrders = ordersService.bulkUpdateOrderStatus(orders, OrderStatus.DELIVERED, true);
         log.info(String.format("%d deliveries completed for %s", updatedOrders, destination.getName()));
-        //TODO update company profit
 
-        //TODO use bulk update in other places
-        //TODO actuator
+        companyInformationService.addToProfit((long) updatedOrders * destination.getDistance());
 
         //TODO swagger
 
